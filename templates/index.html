@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraResume ATS - AI Resume Diagnostic & Optimizer</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Remix Icon CDN for modern icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Canvas Confetti for Score Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="dark-theme">
+    <!-- Background Gradients -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="ri-sparkling-fill"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>AuraResume <span>ATS</span></h1>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="btn-icon" title="Toggle Theme">
+                    <i class="ri-sun-line"></i>
+                </button>
+                <button id="settings-toggle" class="btn-icon" title="API Settings">
+                    <i class="ri-settings-4-line"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="app-content">
+            
+            <!-- STEP 1: INPUT PHASE -->
+            <section id="step-input" class="step-pane active">
+                <div class="hero-section">
+                    <h2>Elevate Your Resume for <span class="gradient-text">ATS Algorithms</span></h2>
+                    <p>Diagnose keyword gaps, enforce formatting constraints, and rewrite your experience with quantified impact metrics in seconds.</p>
+                </div>
+
+                <div class="input-grid">
+                    <div class="card glass-card resume-input-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-file-text-line"></i>
+                                <h3>Paste Existing Resume Text</h3>
+                            </div>
+                            <span class="required-badge">Required</span>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="resume-text" placeholder="Paste the raw text of your current resume here... (Include contact, experience, education, projects, and skills)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="card glass-card jd-input-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-briefcase-line"></i>
+                                <h3>Paste Job Description (JD)</h3>
+                            </div>
+                            <span class="optional-badge">Optional but Recommended</span>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="jd-text" placeholder="Paste the job description of your target role to enable smart keyword optimization and matching..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button id="btn-scan" class="btn btn-primary btn-large">
+                        <span class="btn-text">Diagnose & Rewrite</span>
+                        <i class="ri-shield-flash-line"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: Q&A INTERACTIVE GAP ANALYSIS -->
+            <section id="step-qa" class="step-pane">
+                <div class="hero-section">
+                    <h2><span class="gradient-text">Interactive Gap Analysis</span></h2>
+                    <p>We found some critical gaps or unquantified achievements. Answering these questions will significantly boost your ATS score.</p>
+                </div>
+
+                <div class="qa-container">
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-questionnaire-line"></i>
+                                <h3>Dynamic Follow-Up Questions</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="qa-form">
+                                <div id="qa-questions-list">
+                                    <!-- Questions will be injected here dynamically -->
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-footer gap-actions">
+                    <button id="btn-qa-skip" class="btn btn-secondary">
+                        <span>Skip & Generate Anyway</span>
+                        <i class="ri-skip-forward-line"></i>
+                    </button>
+                    <button id="btn-qa-submit" class="btn btn-primary">
+                        <span>Optimize Resume</span>
+                        <i class="ri-checkbox-circle-line"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 3: DIAGNOSTIC DASHBOARD & RESULTS -->
+            <section id="step-results" class="step-pane">
+                <div class="dashboard-grid">
+                    
+                    <!-- LEFT COLUMN: DIAGNOSTIC SCORECARD -->
+                    <div class="dashboard-sidebar">
+                        <!-- Score Card -->
+                        <div class="card glass-card score-card">
+                            <div class="score-container">
+                                <svg class="score-ring" viewBox="0 0 120 120">
+                                    <circle class="score-ring-bg" cx="60" cy="60" r="52"></circle>
+                                    <circle class="score-ring-fill" id="score-fill" cx="60" cy="60" r="52"></circle>
+                                </svg>
+                                <div class="score-label">
+                                    <span id="score-num">0</span>
+                                    <span class="score-sub">ATS Score</span>
+                                </div>
+                            </div>
+                            <div class="score-eval">
+                                <h4 id="score-heading">Calculating...</h4>
+                                <p id="score-description">Your profile compatibility rating.</p>
+                            </div>
+                        </div>
+
+                        <!-- Strengths & Weaknesses -->
+                        <div class="card glass-card feedback-card">
+                            <div class="tabs-header">
+                                <button class="tab-btn active" data-tab="tab-strengths">
+                                    <i class="ri-checkbox-circle-fill text-success"></i> Strengths
+                                </button>
+                                <button class="tab-btn" data-tab="tab-weaknesses">
+                                    <i class="ri-error-warning-fill text-danger"></i> Weaknesses
+                                </button>
+                            </div>
+                            <div class="tab-content">
+                                <div id="tab-strengths" class="tab-pane active">
+                                    <ul id="strengths-list" class="feedback-list">
+                                        <!-- Dynamic Strengths -->
+                                    </ul>
+                                </div>
+                                <div id="tab-weaknesses" class="tab-pane">
+                                    <ul id="weaknesses-list" class="feedback-list">
+                                        <!-- Dynamic Weaknesses -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rules Enforced -->
+                        <div class="card glass-card rules-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-shield-check-line"></i>
+                                    <h3>Core Constraints Diagnostic</h3>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="rules-list" class="rules-list">
+                                    <!-- Rules mapping here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: OPTIMIZED RESUME PREVIEW -->
+                    <div class="dashboard-main">
+                        <div class="card glass-card resume-output-card">
+                            <div class="card-header resume-output-header">
+                                <div class="card-title">
+                                    <i class="ri-file-shield-2-line"></i>
+                                    <h3>ATS-Optimized Resume</h3>
+                                </div>
+                                <div class="resume-actions">
+                                    <div class="view-toggle">
+                                        <button id="btn-view-preview" class="toggle-btn active" title="Rendered Preview">
+                                            <i class="ri-eye-line"></i> Preview
+                                        </button>
+                                        <button id="btn-view-raw" class="toggle-btn" title="Raw Markdown Source">
+                                            <i class="ri-code-line"></i> Markdown
+                                        </button>
+                                    </div>
+                                    <button id="btn-copy" class="btn btn-secondary btn-sm" title="Copy to Clipboard">
+                                        <i class="ri-file-copy-line"></i> Copy
+                                    </button>
+                                    <button id="btn-print" class="btn btn-primary btn-sm" title="Print / Save PDF">
+                                        <i class="ri-printer-line"></i> Print
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body resume-body-container">
+                                <!-- Print Container (Renders clean resume text for print stylesheet) -->
+                                <div id="print-resume-content" class="resume-formatted-view"></div>
+                                <textarea id="raw-resume-content" class="resume-raw-view" readonly></textarea>
+                            </div>
+                        </div>
+
+                        <div class="results-footer">
+                            <button id="btn-restart" class="btn btn-outline">
+                                <i class="ri-restart-line"></i>
+                                <span>Optimize Another Resume</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h3><i class="ri-settings-5-line"></i> Diagnostic Engine Settings</h3>
+                <button id="settings-close" class="btn-icon modal-close">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="settings-api-key">Gemini API Key</label>
+                    <div class="input-with-icon">
+                        <i class="ri-key-2-line"></i>
+                        <input type="password" id="settings-api-key" placeholder="Enter Gemini API Key..." />
+                        <button id="toggle-key-visibility" class="btn-input-action">
+                            <i class="ri-eye-line"></i>
+                        </button>
+                    </div>
+                    <small class="form-help">Provided default key is prefilled. You can override it here if needed.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="settings-model">Gemini Model</label>
+                    <select id="settings-model">
+                        <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Default)</option>
+                        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-save-settings" class="btn btn-primary w-full">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCANNING LOADING SCREEN -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="scanner-container">
+                <div class="pulse-ring"></div>
+                <div class="scanner-icon">
+                    <i class="ri-file-search-line"></i>
+                </div>
+                <div class="scan-bar"></div>
+            </div>
+            <h3 id="loading-title">Scanning Resume...</h3>
+            <p id="loading-subtitle">Applying 8 ATS constraints & parsing structural details.</p>
+            <div class="loading-steps">
+                <div class="step-indicator" id="loader-step-1"><i class="ri-checkbox-circle-fill"></i> Parsing resume content</div>
+                <div class="step-indicator" id="loader-step-2"><i class="ri-checkbox-circle-fill"></i> Comparing with Job Description</div>
+                <div class="step-indicator" id="loader-step-3"><i class="ri-checkbox-circle-fill"></i> Generating diagnostic score</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">
+        <i class="ri-info-card-line toast-icon"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- Main Application JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
